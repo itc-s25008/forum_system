@@ -1,0 +1,30 @@
+name: forum_board
+
+services:
+  valkey:
+    image: valkey/valkey:8-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - type: volume
+        source: valkey-data
+        target: /data
+
+  db:
+    image: postgres:18-alpine
+    shm_size: 128mb
+    environment:
+      POSTGRES_PASSWORD: foobarhogepiyo
+    volumes:
+      - type: volume
+        source: db-data
+        target: /var/lib/postgresql
+      - type: bind
+        source: ./initdb.d
+        target: /docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+
+volumes:
+  db-data:
+  valkey-data:

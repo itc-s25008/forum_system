@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String    @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  email     String    @unique @db.VarChar(256)
+  password  String    @db.VarChar(192)
+  name      String?   @db.VarChar(128)
+  createdAt DateTime  @default(now())
+  deletedAt DateTime?
+
+  topics Topic[]
+  posts  Post[]
+}
+
+model Topic {
+  id        String    @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  authorId  String    @db.Uuid
+  title     String    @db.VarChar(256)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now()) @updatedAt
+  deletedAt DateTime?
+
+  author User   @relation(fields: [authorId], references: [id])
+  posts  Post[]
+}
+
+model Post {
+  id            String    @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  topicId       String    @db.Uuid
+  contributorId String    @db.Uuid
+  message       String    @db.VarChar(512)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @default(now()) @updatedAt
+  deletedAt     DateTime?
+
+  topic       Topic @relation(fields: [topicId], references: [id])
+  contributor User  @relation(fields: [contributorId], references: [id])
+}
